@@ -17,6 +17,12 @@ attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap
 	accessToken: API_KEY
 });
 
+let night = L.tileLayer('https://api.mapbox.com/styles/v1/mapbox/dark-v10/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+attribution: 'Map data © <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',
+	maxZoom: 18,
+	accessToken: API_KEY
+});
+
 let map = L.map('mapid', {
     center: [39.5, -98.5],
     zoom: 3,
@@ -26,15 +32,19 @@ let map = L.map('mapid', {
 // Create a base layer that holds both maps.
 let baseMaps = {
     "Streets": streets,
-    "Satellite": satelliteStreets
+    "Satellite": satelliteStreets,
+    "Night": night
 };
 // Create the earthquake layer for our map.
 let earthquakes = new L.layerGroup();
+// create tectonic plate layer for map.
+let tectonicPlates = new L.layerGroup();
 
 // We define an object that contains the overlays.
 // This overlay will be visible all the time.
 let overlays = {
-    Earthquakes: earthquakes
+    Earthquakes: earthquakes,
+    "Tectonic Plates": tectonicPlates
   };
 
 // Then we add a control to the map that will allow the user to change
@@ -143,3 +153,20 @@ d3.json("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geoj
     legend.addTo(map);
 
 });
+
+
+
+// retieve the tectonic plates GeoJSON data
+
+d3.json("https://raw.githubusercontent.com/fraxen/tectonicplates/master/GeoJSON/PB2002_boundaries.json").then(function(data2){
+    //creating a GEoJSON layer with the retrieved data
+    L.geoJson(data2, {
+        color: "greenyellow",
+        weight: 4
+    }).addTo(tectonicPlates);
+
+    tectonicPlates.addTo(map);
+
+
+});
+
